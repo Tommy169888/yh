@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>收费录入</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="form-page">
+        <div class="form-box">
+            <h2 id="title" class="form-title"></h2>
+            <div class="form-info">
+                <div class="info-row">
+                    <span>编号：<strong id="no"></strong></span>
+                    <span>日期：<span id="date"></span></span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">基本信息</h3>
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label>姓名：</label>
+                        <input id="name" placeholder="请输入患者姓名" required>
+                    </div>
+                    <div class="form-row">
+                        <label>性别：</label>
+                        <select id="gender" required>
+                            <option value="">请选择</option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>年龄：</label>
+                        <input id="age" type="number" min="1" max="120" placeholder="请输入年龄" required>
+                    </div>
+                    <div class="form-row" id="visitDateRow">
+                        <label>就诊日期：</label>
+                        <input id="visitDate" type="date" required>
+                    </div>
+                    <div class="form-row" id="admitDateRow" style="display:none;">
+                        <label>住院日期：</label>
+                        <input id="admitDate" type="date">
+                    </div>
+                    <div class="form-row">
+                        <label>医生：</label>
+                        <input id="doctor" list="doctorList" placeholder="请选择或输入">
+                        <datalist id="doctorList">
+                            <option value="孙主任">
+                            <option value="罗医生">
+                            <option value="张医生">
+                            <option value="李医生">
+                            <option value="朱医生">
+                        </datalist>
+                    </div>
+                    <div class="form-row">
+                        <label>收费员：</label>
+                        <select id="cashier" required>
+                            <option value="">请选择</option>
+                            <option value="小肖">小肖</option>
+                            <option value="小娟">小娟</option>
+                            <option value="小李">小李</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">收费项目</h3>
+                <div class="quick-actions">
+                    <button onclick="clearAllFees()" class="quick-btn danger">清空费用</button>
+                    <button onclick="fillTemplate('common')" class="quick-btn">常用模板</button>
+                    <button onclick="fillTemplate('check')" class="quick-btn">检查模板</button>
+                </div>
+                <div id="feeArea" class="fee-grid"></div>
+            </div>
+
+            <div class="section summary-section">
+                <div class="summary-row">
+                    <label>总计金额：</label>
+                    <input id="total" readonly class="total-input" placeholder="0.00">
+                </div>
+                <div class="summary-row">
+                    <label>实付金额：</label>
+                    <input id="paid" type="number" step="0.01" placeholder="请输入实付金额">
+                </div>
+                <div class="summary-row">
+                    <label>支付方式：</label>
+                    <select id="payMethod" class="pay-method-select">
+                        <option value="现金">现金</option>
+                        <option value="ABA">ABA</option>
+                        <option value="汇旺">汇旺</option>
+                        <option value="微信">微信</option>
+                        <option value="支付宝">支付宝</option>
+                    </select>
+                </div>
+                <div class="summary-row" id="prepayRow" style="display:none;">
+                    <label>已预收：</label>
+                    <input id="prepay" type="number" step="0.01" placeholder="请输入预收金额" value="0">
+                </div>
+                <div class="summary-row" id="balanceRow" style="display:none;">
+                    <label>补收/退款：</label>
+                    <input id="balance" readonly class="balance-input" placeholder="自动计算">
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button onclick="submitForm()" class="btn-primary">生成收据</button>
+                <button onclick="saveDraft()" class="btn-secondary">保存草稿</button>
+                <button onclick="goBack()" class="btn-secondary">返回首页</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

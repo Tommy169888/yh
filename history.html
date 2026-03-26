@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>历史记录</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 10px;
+        }
+        
+        .page-btn {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .page-btn:hover {
+            background: #1565c0;
+            color: white;
+            border-color: #1565c0;
+        }
+        
+        .page-btn.active {
+            background: #1565c0;
+            color: white;
+            border-color: #1565c0;
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="history-page">
+        <h2 class="page-title">📋 收费历史记录</h2>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">总记录数</span>
+                <span class="stat-value" id="totalCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">今日记录</span>
+                <span class="stat-value" id="todayCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">总金额 (USD)</span>
+                <span class="stat-value">$ <span id="totalAmount">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">门诊金额</span>
+                <span class="stat-value">$ <span id="opdAmount">0.00</span></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">住院金额</span>
+                <span class="stat-value">$ <span id="ipdAmount">0.00</span></span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="filter-group">
+                <input type="date" id="filterDate" class="filter-input">
+                <input type="text" id="filterName" class="filter-input" placeholder="患者姓名">
+                <select id="filterType" class="filter-input">
+                    <option value="">全部类型</option>
+                    <option value="opd">门诊</option>
+                    <option value="ipd">住院</option>
+                </select>
+                <button onclick="filterRecords()" class="btn-primary">筛选</button>
+                <button onclick="resetFilter()" class="btn-secondary">重置</button>
+            </div>
+            <div class="action-group">
+                <button onclick="exportData()" class="btn-secondary">导出CSV</button>
+                <button onclick="clearAll()" class="btn-danger">清空记录</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>日期</th>
+                        <th>类型</th>
+                        <th>姓名</th>
+                        <th>医生</th>
+                        <th>收费员</th>
+                        <th>总金额</th>
+                        <th>实付</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </div>
+        
+        <div class="pagination" id="pagination"></div>
+
+        <div id="emptyState" class="empty-state" style="display:none;">
+            <div class="empty-icon">📭</div>
+            <div class="empty-text">暂无记录</div>
+        </div>
+
+        <div class="back-link">
+            <a href="index.html" class="nav-link">← 返回首页</a>
+        </div>
+    </div>
+
+    <script>
+        let currentRecords = [];
+        let currentPage = 1;
+        const pageSize = 20;
+
+        function loadHistory() {
+            const records = JSON.parse(localStorage.getItem("receiptHistory") || "[]");
+            const today = new Date().toISOString().slice(0, 10);
+            
+            // 统计数据
+            document.getElementById("totalCount").innerText = records.length;
+            document.getElementById("todayCount").innerText = records.filter(r => 
+                r.date && r.date.includes(today)
+            ).length;
+            
+            const totalAmount = records.reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0);
+            document.getElementById("totalAmount").innerText = totalAmount.toFixed(2);
+            
+            const opdAmount = records.filter(r => r.type === 'opd').reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0);
+            document.getElementById("opdAmount").innerText = opdAmount.toFixed(2);
+            
+            const ipdAmount = records.filter(r => r.type === 'ipd').reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0);
+            document.getElementById("ipdAmount").innerText = ipdAmount.toFixed(2);
+
+            currentRecords = records;
+            currentPage = 1;
+            renderTable(records);
+        }
+
+        function renderTable(records) {
+            const tbody = document.getElementById("historyBody");
+            const emptyState = document.getElementById("emptyState");
+            const pagination = document.getElementById("pagination");
+            
+            if (records.length === 0) {
+                tbody.innerHTML = "";
+                emptyState.style.display = "block";
+                pagination.style.display = "none";
+                return;
+            }
+            
+            emptyState.style.display = "none";
+            pagination.style.display = "flex";
+            
+            // 排序：最新的在前面
+            records.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // 分页
+            const totalPages = Math.ceil(records.length / pageSize);
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageRecords = records.slice(start, end);
+            
+            tbody.innerHTML = pageRecords.map((r) => `
+                <tr>
+                    <td>${r.no}</td>
+                    <td>${r.date}</td>
+                    <td><span class="type-badge ${r.type}">${r.type === 'opd' ? '门诊' : '住院'}</span></td>
+                    <td>${r.name}</td>
+                    <td>${r.doctor || '-'}</td>
+                    <td>${r.cashier || '-'}</td>
+                    <td class="amount">$ ${parseFloat(r.total).toFixed(2)}</td>
+                    <td class="amount">$ ${parseFloat(r.paid).toFixed(2)}</td>
+                    <td class="actions">
+                        <button onclick="reprint('${r.no}')" class="btn-small">打印</button>
+                        <button onclick="deleteRecord('${r.no}')" class="btn-small btn-danger">删除</button>
+                    </td>
+                </tr>
+            `).join("");
+            
+            // 渲染分页
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const pagination = document.getElementById("pagination");
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let html = `
+                <button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
+                <span class="page-info">${currentPage} / ${totalPages}</span>
+                <button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
+            `;
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            filterRecords();
+        }
+
+        function filterRecords() {
+            const date = document.getElementById("filterDate").value;
+            const name = document.getElementById("filterName").value.toLowerCase();
+            const type = document.getElementById("filterType").value;
+            
+            let records = JSON.parse(localStorage.getItem("receiptHistory") || "[]");
+            
+            if (date) records = records.filter(r => r.date && r.date.includes(date));
+            if (name) records = records.filter(r => r.name && r.name.toLowerCase().includes(name));
+            if (type) records = records.filter(r => r.type === type);
+            
+            currentRecords = records;
+            currentPage = 1;
+            renderTable(records);
+        }
+
+        function resetFilter() {
+            document.getElementById("filterDate").value = "";
+            document.getElementById("filterName").value = "";
+            document.getElementById("filterType").value = "";
+            loadHistory();
+        }
+
+        function reprint(no) {
+            const records = JSON.parse(localStorage.getItem("receiptHistory") || "[]");
+            const record = records.find(r => r.no === no);
+            if (record) {
+                localStorage.setItem("printData", JSON.stringify(record));
+                window.open(record.type === 'opd' ? 'print_opd.html' : 'print_ipd.html', '_blank');
+            }
+        }
+
+        function deleteRecord(no) {
+            if (!confirm("确定要删除这条记录吗？")) return;
+            let records = JSON.parse(localStorage.getItem("receiptHistory") || "[]");
+            records = records.filter(r => r.no !== no);
+            localStorage.setItem("receiptHistory", JSON.stringify(records));
+            loadHistory();
+        }
+
+        function exportData() {
+            const records = JSON.parse(localStorage.getItem("receiptHistory") || "[]");
+            if (records.length === 0) { alert("没有数据可导出！"); return; }
+            
+            const csv = convertToCSV(records);
+            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `收费记录_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        function convertToCSV(records) {
+            const headers = ["编号", "日期", "类型", "姓名", "性别", "年龄", "医生", "收费员", "就诊/住院日期", "支付方式", "总金额", "实付金额", "预交金", "费用明细"];
+            const rows = records.map(r => [
+                r.no, r.date, r.type === 'opd' ? '门诊' : '住院', r.name, r.gender, r.age, 
+                r.doctor || '', r.cashier || '', r.visitDate || r.admitDate || '', 
+                r.payMethod || '现金', r.total, r.paid, r.prepay || '0', JSON.stringify(r.fees || {})
+            ]);
+            return [headers.join(","), ...rows.map(r => r.map(field => `"${field}"`).join(","))].join("\n");
+        }
+
+        function clearAll() {
+            if (!confirm("确定要清空所有记录吗？此操作不可恢复！")) return;
+            if (!confirm("再次确认：真的要清空所有记录吗？")) return;
+            localStorage.removeItem("receiptHistory");
+            loadHistory();
+        }
+
+        window.onload = loadHistory;
+    </script>
+</body>
+</html>

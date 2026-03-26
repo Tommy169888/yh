@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>住院收费收据</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: "SimSun", "宋体", "Microsoft YaHei", serif;
+            background: white;
+        }
+        
+        /* 打印设置 */
+        @page {
+            size: 241mm 140mm landscape;
+            margin: 0;
+        }
+        
+        @media print {
+            @page {
+                size: 241mm 140mm landscape;
+                margin: 0;
+            }
+            html, body {
+                width: 241mm;
+                height: 140mm;
+                overflow: hidden;
+                background: white;
+            }
+            .no-print { display: none !important; }
+            .receipt-container {
+                width: 241mm;
+                height: 140mm;
+                padding: 4mm 6mm;
+                margin: 0;
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+        }
+        
+        .receipt-container {
+            width: 241mm;
+            height: 140mm;
+            padding: 4mm 6mm;
+            margin: 0 auto;
+            background: white;
+            font-size: 10.5pt;
+            line-height: 1.15;
+        }
+        
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 2mm;
+            height: 14mm;
+        }
+        
+        .hospital-name {
+            font-size: 18pt;
+            font-weight: bold;
+            letter-spacing: 10px;
+            margin-bottom: 1mm;
+            line-height: 1.2;
+        }
+        
+        .receipt-type {
+            font-size: 12pt;
+            font-weight: bold;
+            letter-spacing: 4px;
+        }
+        
+        .receipt-no {
+            text-align: right;
+            font-size: 10pt;
+            margin-bottom: 2mm;
+            font-weight: bold;
+            height: 5mm;
+        }
+        
+        /* 患者信息 */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2mm;
+            font-size: 10.5pt;
+            border: 1px solid #000;
+            height: 8mm;
+        }
+        
+        .info-table td {
+            border: 1px solid #000;
+            padding: 1.5mm 2mm;
+            vertical-align: middle;
+            height: 8mm;
+        }
+        
+        /* 收费明细 */
+        .receipt-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2mm;
+            font-size: 10pt;
+            border: 1px solid #000;
+            table-layout: fixed;
+        }
+        
+        .receipt-table th {
+    border: 1px solid #000;
+    padding: 1mm 1.5mm;
+    text-align: center;
+    vertical-align: middle;
+    height: 7mm;
+    font-weight: bold;
+    font-size: 10.5pt;
+    background: #fff;
+}
+
+.receipt-table td {
+    border: 1px solid #000;
+    padding: 1mm 1.5mm;
+    text-align: center;
+    vertical-align: middle;
+    height: 6.5mm;
+    font-size: 11pt;  /* 从10pt增大到11pt，或改为12pt */
+}
+        
+        .receipt-table th {
+            font-weight: bold;
+            font-size: 10.5pt;
+            background: #fff;
+            height: 7mm;
+        }
+        
+        .amount {
+            text-align: right;
+            padding-right: 2mm;
+            font-family: "Arial", sans-serif;
+        }
+        
+        .item-main {
+            font-weight: bold;
+        }
+        
+        .where-cell {
+            font-size: 9pt;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing: 1px;
+            width: 4%;
+        }
+        
+        /* 合计行 */
+        .total-row {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11pt;
+    font-weight: bold;
+    border: 1px solid #000;
+    margin-bottom: 2mm;
+    height: 9mm;
+}
+
+.total-row td {
+    border: 1px solid #000;
+    padding: 1.5mm 2mm;
+    vertical-align: middle;
+    height: 9mm;
+}
+
+/* 大写金额列 - 宽度自适应 */
+.total-row td:first-child {
+    width: auto;
+    text-align: left;
+    font-size: 10.5pt;  /* 大写金额稍小一点避免换行 */
+}
+
+/* 实付标签列 - 居中且窄 */
+.total-row td:nth-child(2) {
+    width: 12%;
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* 金额列 - 固定宽度容10位数字 */
+.total-row td:last-child {
+    width: 22%;
+    text-align: right;
+    padding-right: 3mm;
+    font-family: "Arial", sans-serif;
+    letter-spacing: 0.5px;
+}
+        
+        /* 预交金行 */
+        .prepay-row {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10.5pt;
+            border: 1px solid #000;
+            margin-bottom: 2mm;
+        }
+        
+        .prepay-row td {
+            border: 1px solid #000;
+            padding: 1.5mm 2mm;
+            vertical-align: middle;
+            height: 7mm;
+            width: 25%;
+        }
+        
+        .prepay-label {
+            font-weight: bold;
+        }
+        
+        .prepay-value {
+            text-align: right;
+            padding-right: 2mm;
+            font-family: "Arial", sans-serif;
+        }
+        
+        /* 底部 */
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5pt;
+            margin-top: 2mm;
+            padding: 0 1mm;
+            height: 6mm;
+            line-height: 6mm;
+        }
+        
+        .footer-item {
+            flex: 1;
+            white-space: nowrap;
+        }
+        
+        /* 打印按钮 */
+        .print-actions {
+            text-align: center;
+            padding: 20px;
+            background: #f5f5f5;
+            margin-top: 20px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            padding: 10px 25px;
+            margin: 0 8px;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn-primary { background: #1565c0; color: white; }
+        .btn-primary:hover { background: #0d47a1; }
+        .btn-secondary { background: white; color: #1565c0; border: 2px solid #1565c0; }
+        .btn-secondary:hover { background: #1565c0; color: white; }
+        
+        /* 预览模式 */
+        @media screen {
+            body {
+                background: #f0f0f0;
+                padding: 20px;
+            }
+            .receipt-container {
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            }
+        }
+    </style>
+</head>
+<body onload="loadData()">
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <div class="hospital-name">宜 和 医 院</div>
+            <div class="receipt-type">住院收费收据</div>
+        </div>
+
+        <div class="receipt-no">NO.<span id="no"></span></div>
+
+        <!-- 患者信息 -->
+        <table class="info-table">
+            <tr>
+                <td style="width: 35%;">姓名：<span id="name"></span></td>
+                <td style="width: 20%;">性别：<span id="gender"></span></td>
+                <td style="width: 20%;">年龄：<span id="age"></span></td>
+                <td style="width: 25%;">住院日期：<span id="admitDate"></span></td>
+            </tr>
+        </table>
+
+        <!-- 收费明细 -->
+        <table class="receipt-table">
+            <thead>
+                <tr>
+                    <th style="width: 22%;" colspan="2">医疗项目</th>
+                    <th style="width: 11%;">金额</th>
+                    <th style="width: 22%;" colspan="2">医疗项目</th>
+                    <th style="width: 11%;">金额</th>
+                    <th style="width: 22%;" colspan="2">医疗项目</th>
+                    <th style="width: 12%;">金额</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="item-main" colspan="2">药费</td>
+                    <td class="amount" id="fee-药费"></td>
+                    <td class="item-main" colspan="2">床位费</td>
+                    <td class="amount" id="fee-床位费"></td>
+                    <td class="item-main" colspan="2">治疗费</td>
+                    <td class="amount" id="fee-治疗费"></td>
+                </tr>
+                <tr>
+                    <td class="where-cell" rowspan="3">其中</td>
+                    <td>西药</td>
+                    <td class="amount" id="fee-西药"></td>
+                    <td class="item-main" colspan="2">诊查费</td>
+                    <td class="amount" id="fee-诊查费"></td>
+                    <td class="where-cell" rowspan="2">其中</td>
+                    <td>输血费</td>
+                    <td class="amount" id="fee-输血费"></td>
+                </tr>
+                <tr>
+                    <td>中成药</td>
+                    <td class="amount" id="fee-中成药"></td>
+                    <td class="item-main" colspan="2">检查费</td>
+                    <td class="amount" id="fee-检查费"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>中草药</td>
+                    <td class="amount" id="fee-中草药"></td>
+                    <td class="where-cell" rowspan="2">其中</td>
+                    <td>B超</td>
+                    <td class="amount" id="fee-B超"></td>
+                    <td class="item-main" colspan="2">手术费</td>
+                    <td class="amount" id="fee-手术费"></td>
+                </tr>
+                <tr>
+                    <td colspan="2">药事服务费</td>
+                    <td class="amount" id="fee-药事服务费"></td>
+                    <td>CT</td>
+                    <td class="amount" id="fee-CT"></td>
+                    <td colspan="2">卫生材料费</td>
+                    <td class="amount" id="fee-卫生材料费"></td>
+                </tr>
+                <tr>
+                    <td colspan="2"></td>
+                    <td></td>
+                    <td colspan="2"></td>
+                    <td></td>
+                    <td colspan="2">护理费</td>
+                    <td class="amount" id="fee-护理费"></td>
+                </tr>
+                <tr>
+    <td colspan="2"></td>
+    <td></td>
+    <td colspan="2">化验费</td>
+    <td class="amount" id="fee-化验费"></td>
+    <td colspan="2">其他</td>
+    <td class="amount" id="fee-其他"></td>
+</tr>
+<!-- 删除原来的化验费单独一行 -->
+            </tbody>
+        </table>
+
+        <!-- 合计 -->
+        <table class="total-row">
+    <tr>
+        <td>合计美元：<span id="totalUpper"></span></td>
+        <td>实付：</td>
+        <td><span id="paid"></span> <span id="payMethodDisplay"></span></td>
+    </tr>
+</table>
+
+        <!-- 预交金信息 -->
+        <table class="prepay-row">
+            <tr>
+                <td class="prepay-label">已预收：<span class="prepay-value" id="prepay"></span></td>
+                <td class="prepay-label">补收：<span class="prepay-value" id="extraPay"></span></td>
+                <td class="prepay-label">退款：<span class="prepay-value" id="refund"></span></td>
+                <td class="prepay-label">欠费：<span class="prepay-value" id="arrears"></span></td>
+            </tr>
+        </table>
+
+        <!-- 底部 -->
+        <div class="footer-info">
+            <div class="footer-item">收费单位（盖章）：</div>
+            <div class="footer-item">医生：<span id="doctor"></span></div>
+            <div class="footer-item">收费员：<span id="cashier"></span></div>
+            <div class="footer-item">打印时间：<span id="printTime"></span></div>
+        </div>
+    </div>
+
+    <div class="print-actions no-print">
+        <button onclick="window.print()" class="btn-primary">打印收据</button>
+        <button onclick="goBack()" class="btn-secondary">返回</button>
+    </div>
+
+    <script>
+        // 数字转中文大写
+function digitUppercase(n) {
+    var fraction = ['角', '分'];
+    var digit = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'];
+    var unit = [['元', '万', '亿'], ['', '拾', '佰', '仟']];
+    var head = n < 0 ? '欠' : '';
+    n = Math.abs(n);
+    var s = '';
+    for (var i = 0; i < fraction.length; i++) {
+        s += (digit[Math.floor(n * 10 * Math.pow(10, i)) % 10] + fraction[i]).replace(/零./, '');
+    }
+    s = s || '整';
+    n = Math.floor(n);
+    for (var i = 0; i < unit[0].length && n > 0; i++) {
+        var p = '';
+        for (var j = 0; j < unit[1].length && n > 0; j++) {
+            p = digit[n % 10] + unit[1][j] + p;
+            n = Math.floor(n / 10);
+        }
+        s = p.replace(/(零.)*零$/, '').replace(/^$/, '零') + unit[0][i] + s;
+    }
+    return head + s.replace(/(零.)*零元/, '元').replace(/(零.)+/g, '零').replace(/^整$/, '零元整');
+}
+        function loadData() {
+            try {
+                const dataStr = localStorage.getItem("printData");
+                if (!dataStr) {
+                    alert("没有数据，请重新录入！");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                const data = JSON.parse(dataStr);
+                
+                const total = parseFloat(data.total) || 0;
+                const prepay = parseFloat(data.prepay) || 0;
+                const paid = parseFloat(data.paid) || 0;
+
+                setText("no", data.no);
+                setText("name", data.name);
+                setText("gender", data.gender);
+                setText("age", data.age);
+                setText("admitDate", formatDate(data.admitDate));
+                setText("doctor", data.doctor || '');
+                setText("cashier", data.cashier || '');
+                setText("printTime", formatDateTime(new Date()));
+                
+                // 显示大写金额
+                setText("totalUpper", total > 0 ? digitUppercase(total) : '');
+                setText("paid", paid > 0 ? '$ ' + paid.toFixed(2) : '');
+                setText("payMethodDisplay", '(' + (data.payMethod || '现金') + ')');
+
+                // 预交金计算
+                setText("prepay", prepay > 0 ? '$ ' + prepay.toFixed(2) : '');
+                
+                if (prepay > 0) {
+                    if (prepay < total) {
+                        setText("extraPay", '$ ' + (total - prepay).toFixed(2));
+                        setText("refund", '');
+                    } else {
+                        setText("extraPay", '');
+                        setText("refund", '$ ' + (prepay - total).toFixed(2));
+                    }
+                } else {
+                    setText("extraPay", total > 0 ? '$ ' + total.toFixed(2) : '');
+                    setText("refund", '');
+                }
+                
+                const arrears = total - paid;
+                setText("arrears", arrears > 0 ? '$ ' + arrears.toFixed(2) : '');
+
+                // 填充费用明细
+                const fields = ['药费','床位费','西药','中成药','中草药','药事服务费','诊查费','检查费','B超','CT','治疗费','输血费','手术费','卫生材料费','护理费','化验费','其他'];
+                fields.forEach(key => {
+                    const el = document.getElementById("fee-" + key);
+                    if (el && data.fees && data.fees[key]) {
+                        const val = parseFloat(data.fees[key]);
+                        el.innerText = val > 0 ? val.toFixed(2) : '';
+                    }
+                });
+            } catch (e) {
+                console.error("加载失败：", e);
+                alert("加载数据失败：" + e.message);
+            }
+        }
+
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.innerText = value || '';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr;
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function formatDateTime(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const h = String(date.getHours()).padStart(2, '0');
+            const min = String(date.getMinutes()).padStart(2, '0');
+            return `${y}-${m}-${d} ${h}:${min}`;
+        }
+
+        function goBack() {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

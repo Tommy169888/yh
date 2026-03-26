@@ -1,0 +1,438 @@
+/* 宜和医院收费收据系统 - 样式表 v2.1 */
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+}
+
+html { font-size: 16px; }
+
+body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 首页 */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.logo { 
+    width: 260px; 
+    max-width: 80%; 
+    margin-bottom: 25px; 
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); 
+}
+
+.title {
+    font-size: 28px;
+    color: #1565c0;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 50px;
+    letter-spacing: 6px;
+    text-align: center;
+}
+
+.btn-group { 
+    display: flex; 
+    gap: 40px; 
+    justify-content: center; 
+    margin-bottom: 40px; 
+    flex-wrap: wrap; 
+}
+
+.btn-box { 
+    position: relative; 
+    width: 170px; 
+    cursor: pointer; 
+    transition: transform 0.3s ease; 
+}
+.btn-box:hover { transform: translateY(-6px) scale(1.03); }
+.btn-box:active { transform: translateY(-2px) scale(0.98); }
+
+.btn-img { 
+    width: 100%; 
+    display: block; 
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); 
+}
+
+.btn-center {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.nav-links { margin-top: 20px; }
+
+.nav-link {
+    color: #1565c0;
+    text-decoration: none;
+    font-size: 15px;
+    padding: 10px 24px;
+    border: 2px solid #1565c0;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+.nav-link:hover { background: #1565c0; color: white; }
+
+/* 表单页面 */
+.form-page { padding: 20px; min-height: 100vh; }
+
+.form-box {
+    max-width: 950px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.form-title {
+    text-align: center;
+    color: #1565c0;
+    font-size: 22px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e3f2fd;
+}
+
+.form-info {
+    background: #f5f5f5;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #666;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.section { margin-bottom: 20px; }
+
+.section-title {
+    color: #1565c0;
+    font-size: 15px;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 4px solid #1565c0;
+}
+
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+.form-row { display: flex; align-items: center; gap: 8px; }
+
+.form-row label { min-width: 80px; color: #555; font-size: 13px; white-space: nowrap; }
+
+.form-row input,
+.form-row select {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s;
+    min-width: 0;
+}
+
+.form-row input:focus,
+.form-row select:focus { 
+    outline: none; 
+    border-color: #1565c0;
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+}
+
+/* 收费项目 */
+.quick-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.quick-btn {
+    padding: 8px 16px;
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #1565c0;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.quick-btn:hover {
+    background: #1565c0;
+    color: white;
+}
+
+.quick-btn.danger {
+    background: #ffebee;
+    color: #d32f2f;
+    border-color: #d32f2f;
+}
+
+.quick-btn.danger:hover {
+    background: #d32f2f;
+    color: white;
+}
+
+.fee-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 15px; }
+
+.fee-item { display: flex; align-items: center; gap: 6px; min-width: 0; }
+
+.fee-icon { font-size: 14px; flex-shrink: 0; }
+
+.fee-item label { font-size: 13px; color: #555; white-space: nowrap; flex-shrink: 0; min-width: 70px; }
+
+.fee-item input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    text-align: right;
+    min-width: 60px;
+    max-width: 100%;
+    transition: all 0.3s;
+}
+
+.fee-item input:focus { 
+    outline: none; 
+    border-color: #1565c0;
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+}
+
+.fee-item input.has-value {
+    background: #e8f5e9;
+    border-color: #4caf50;
+}
+
+/* 合计区域 */
+.summary-section { background: #e3f2fd; padding: 15px; border-radius: 8px; }
+
+.summary-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.summary-row:last-child { margin-bottom: 0; }
+
+.summary-row label { min-width: 90px; color: #333; font-weight: bold; font-size: 13px; }
+
+.summary-row input,
+.pay-method-select {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: right;
+}
+
+.pay-method-select {
+    text-align: left;
+}
+
+.total-input { 
+    background: #fff3e0; 
+    font-weight: bold; 
+    color: #e65100; 
+    font-size: 15px; 
+}
+
+.balance-input { 
+    background: #f5f5f5; 
+    font-weight: bold; 
+}
+.balance-input.extra { color: #d32f2f; }
+.balance-input.refund { color: #388e3c; }
+
+/* 按钮 */
+.form-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 25px; flex-wrap: wrap; }
+
+.btn-primary {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #1565c0, #1976d2);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0d47a1, #1565c0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.4);
+}
+
+.btn-secondary {
+    padding: 12px 28px;
+    background: white;
+    color: #1565c0;
+    border: 2px solid #1565c0;
+    border-radius: 25px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-secondary:hover { background: #1565c0; color: white; }
+
+.btn-danger {
+    padding: 12px 28px;
+    background: white;
+    color: #d32f2f;
+    border: 2px solid #d32f2f;
+    border-radius: 25px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-danger:hover { background: #d32f2f; color: white; }
+
+/* Toast 提示 */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOutUp {
+    from { opacity: 1; transform: translate(-50%, 0); }
+    to { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* 历史记录页面 */
+.history-page { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+.page-title { text-align: center; color: #1565c0; font-size: 22px; margin-bottom: 18px; }
+
+.stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 18px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+}
+
+.stat-item { text-align: center; }
+.stat-label { font-size: 11px; color: #666; display: block; margin-bottom: 4px; }
+.stat-value { font-size: 20px; font-weight: bold; color: #1565c0; }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+
+.filter-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.filter-input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+
+.action-group { display: flex; gap: 8px; }
+
+.table-container { background: white; border-radius: 8px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+.history-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
+
+.history-table th { background: #1565c0; color: white; padding: 10px; text-align: left; white-space: nowrap; }
+.history-table td { padding: 10px; border-bottom: 1px solid #eee; white-space: nowrap; }
+.history-table tr:hover { background: #f5f5f5; }
+.history-table .amount { text-align: right; font-weight: bold; color: #e65100; }
+.history-table .actions { display: flex; gap: 6px; }
+
+.btn-small { padding: 5px 12px; font-size: 11px; border: none; border-radius: 4px; cursor: pointer; background: #1565c0; color: white; white-space: nowrap; }
+.btn-small:hover { background: #0d47a1; }
+.btn-small.btn-danger { background: #d32f2f; }
+.btn-small.btn-danger:hover { background: #b71c1c; }
+
+.empty-state { text-align: center; padding: 50px 20px; background: white; border-radius: 8px; }
+.empty-icon { font-size: 50px; margin-bottom: 15px; }
+.empty-text { font-size: 15px; color: #999; }
+
+.back-link { text-align: center; margin-top: 25px; }
+
+/* 打印页面样式 */
+.print-actions {
+    text-align: center;
+    padding: 20px;
+    background: #f5f5f5;
+    margin-top: 20px;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+    .form-grid { grid-template-columns: repeat(2, 1fr); }
+    .fee-grid { grid-template-columns: repeat(3, 1fr); gap: 8px 10px; }
+    .fee-item label { min-width: 60px; font-size: 12px; }
+    .fee-item input { min-width: 50px; }
+}
+
+@media (max-width: 768px) {
+    html { font-size: 14px; }
+    .container { padding: 15px; }
+    .logo { width: 200px; margin-bottom: 20px; }
+    .title { font-size: 22px; margin-bottom: 35px; letter-spacing: 3px; }
+    .btn-group { flex-direction: column; gap: 25px; }
+    .btn-box { width: 160px; }
+    .btn-center { font-size: 16px; letter-spacing: 3px; }
+    .form-page { padding: 10px; }
+    .form-box { padding: 15px; border-radius: 12px; }
+    .form-title { font-size: 18px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+    .form-row label { min-width: auto; }
+    .form-row input, .form-row select { width: 100%; }
+    .fee-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .fee-item { flex-direction: column; align-items: flex-start; gap: 3px; }
+    .fee-item label { min-width: auto; font-size: 11px; }
+    .fee-item input { width: 100%; min-width: auto; }
+    .summary-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+    .summary-row input { width: 100%; }
+    .form-buttons { flex-direction: column; gap: 10px; }
+    .btn-primary, .btn-secondary, .btn-danger { width: 100%; padding: 14px; }
+    .stats-bar { flex-direction: column; gap: 15px; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .filter-group { flex-direction: column; }
+    .filter-input { width: 100%; }
+    .action-group { justify-content: center; }
+    .history-table { font-size: 11px; }
+    .history-table th, .history-table td { padding: 8px 6px; }
+}
+
+@media (max-width: 375px) {
+    .title { font-size: 20px; }
+    .form-title { font-size: 16px; }
+    .section-title { font-size: 13px; }
+    .fee-grid { grid-template-columns: 1fr; }
+    .fee-item { flex-direction: row; align-items: center; }
+    .fee-item label { min-width: 80px; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .container { padding: 10px; }
+    .logo { width: 120px; margin-bottom: 10px; }
+    .title { font-size: 18px; margin-bottom: 20px; }
+    .btn-group { flex-direction: row; gap: 30px; }
+    .btn-box { width: 130px; }
+}
